@@ -39,3 +39,8 @@ percentScore = (studentScore / maxScore) * 100;
 
 console.log("age and Age are different variables:", age, Age);
 console.log("The student scored " + percentScore + "%.");
+
+// Use const when a variable should not be reassigned.
+// This makes your code clearer and helps prevent accidental changes.
+// Use let only when the variable needs to change later.
+const passingScore = 70;
