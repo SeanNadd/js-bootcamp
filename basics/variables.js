@@ -1,3 +1,6 @@
+// Internally, both let and const create block-scoped lexical bindings and remain in
+// the temporal dead zone until initialized. A let binding can later be reassigned,
+// while a const binding cannot; const protects the binding, not an object's contents.
 // JavaScript variable naming constraints
 
 // 1. Variable names can contain letters, digits, underscores, and dollar signs.
