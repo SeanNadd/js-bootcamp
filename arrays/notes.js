@@ -84,3 +84,45 @@ console.log("sort:", sortExample.sort((a, b) => a - b)); // [2, 5, 10]
 
 // join() returns a string and leaves the array unchanged.
 console.log("join:", ["red", "green", "blue"].join(" - ")); // red - green - blue
+
+
+let numbers = [];
+for (let i = 0; i < 5; i++) {
+    numbers.push(i + 1);
+}
+console.log("numbers:", numbers); // [1, 2, 3, 4, 5]
+
+
+let personObject = { name: "Sean", age: 40 };
+
+let objectArray = [{ name: "Alice", age: 25 }, { name: "Bob", age: 30 }, { name: "Charlie", age: 35 }];
+
+objectArray.push(personObject);
+
+let someFunction = (somePerson) => { objectArray[objectArray.indexOf(somePerson)].name = "Sean Updated"; };
+someFunction(personObject);
+
+console.log(`The index of "Sean Updated" is: ${objectArray.indexOf(personObject)}`);
+
+
+let someFindingFunction = (someName) => {
+    return objectArray.find((somePerson) => somePerson.name === someName);
+};
+
+
+console.log(someFindingFunction("Sean Updated") ? "Found" : "Not Found"); // Found
+
+
+const findNote = (objects, objectName) => {
+    return objects.findIndex((obj) => obj.name === objectName);
+};
+
+console.log(`The index of "Sean Updated" is: ${findNote(objectArray, "Sean Updated")}`);   // 3
+
+
+const filterNotes = (notes, filterParam) => {
+    return notes.filter((note) => note.age > filterParam);
+};
+
+console.log("Current notes:", objectArray);
+console.log("Filtered notes:", filterNotes(objectArray, 30)); // [{name: "Charlie", age: 35}, {name: "Sean Updated", age: 40}]
