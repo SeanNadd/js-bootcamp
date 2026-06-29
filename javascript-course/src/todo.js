@@ -57,6 +57,11 @@ const addButton = () => {
     document.querySelector('body').appendChild(button);
 };
 
+const addFilterEvent = document.querySelector('#searchText')
+    .addEventListener('input', (e) => console.log(e.target))
+
+addFilterEvent;
+
 pAppender();
 
 

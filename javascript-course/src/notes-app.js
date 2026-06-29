@@ -17,19 +17,45 @@ const notes = [
     }
 ];
 
-const addRemoveNoteListener = ((noteIndex, button) => {
+let firstRender = false;
+
+const addFilterListener = ((inputElement) => 
+    inputElement.addEventListener('input', (e) => {
+        const filteredArray = notes.filter((element) => element.body.includes(e.target.value))
+        console.log(filteredArray)
+        pAppender(false, filteredArray)
+    })
+)
+
+const addInputField = (() => {
+    const inputElem = document.createElement('input');
+    inputElem.className = 'textField';
+    inputElem.id = 'textInput';
+    document.querySelector('body').appendChild(inputElem);
+    addFilterListener(inputElem)
+})
+
+
+
+// Apply the filter to the notes array before running any of the renders,
+
+
+
+const addRemoveNoteListener = ((note, button) => {
     button.addEventListener('click', () => {
-        notes.splice(noteIndex, 1);
-        pAppender(false)
+        const noteIndex = notes.indexOf(note);
+
+        notes.splice((noteIndex), 1);
+        pAppender(false, notes)
     })
 })
 
-const pAppender = (firstRender = true) => {
+const pAppender = (firstRender = true, notesArray) => {
     if(!firstRender){
         document.querySelectorAll('p').forEach((e) => e.remove())
         document.querySelectorAll('button').forEach((e) => e.remove())
     }
-    notes.forEach((note, index) => {
+    notesArray.forEach((note, index) => {
         const newP = document.createElement('p');
         newP.className = 'note';
         newP.textContent = note.title + " - " + note.body;
@@ -38,7 +64,7 @@ const pAppender = (firstRender = true) => {
         removeNote.textContent = 'Remove note';
         removeNote.className = 'noteRemoveBtn';
         removeNote.id = index;
-        addRemoveNoteListener(index, removeNote);
+        addRemoveNoteListener(note, removeNote);
 
         document.querySelector('body').appendChild(newP).appendChild(removeNote);
     });
@@ -51,4 +77,5 @@ const pAppender = (firstRender = true) => {
     createNote.addEventListener('click', (e) => console.log("Create note clicked"));
 };
 
-pAppender();
+addInputField();
+pAppender(true, notes);
