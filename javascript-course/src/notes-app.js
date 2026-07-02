@@ -19,10 +19,16 @@ const notes = [
 
 let firstRender = false;
 
+const arrayFilterer = ((filterString) => {        
+        return notes.filter((element) => 
+            element.body.includes(filterString)
+    )})
+        
+
 const addFilterListener = ((inputElement) => 
     inputElement.addEventListener('input', (e) => {
-        const filteredArray = notes.filter((element) => element.body.includes(e.target.value))
-        console.log(filteredArray)
+        console.log(e);
+        let filteredArray = arrayFilterer(e.target.value)
         pAppender(false, filteredArray)
     })
 )
@@ -39,14 +45,13 @@ const addInputField = (() => {
 
 // Apply the filter to the notes array before running any of the renders,
 
-
-
 const addRemoveNoteListener = ((note, button) => {
     button.addEventListener('click', () => {
         const noteIndex = notes.indexOf(note);
 
         notes.splice((noteIndex), 1);
-        pAppender(false, notes)
+
+        pAppender(false, arrayFilterer(document.querySelector('#textInput').value))
     })
 })
 
@@ -54,19 +59,20 @@ const pAppender = (firstRender = true, notesArray) => {
     if(!firstRender){
         document.querySelectorAll('p').forEach((e) => e.remove())
         document.querySelectorAll('button').forEach((e) => e.remove())
+
     }
     notesArray.forEach((note, index) => {
         const newP = document.createElement('p');
         newP.className = 'note';
         newP.textContent = note.title + " - " + note.body;
 
-        const removeNote = document.createElement('button');
-        removeNote.textContent = 'Remove note';
-        removeNote.className = 'noteRemoveBtn';
-        removeNote.id = index;
-        addRemoveNoteListener(note, removeNote);
+        const buttonRemove = document.createElement('button');
+        buttonRemove.textContent = 'Remove note';
+        buttonRemove.className = 'noteRemoveBtn';
+        buttonRemove.id = index;
+        addRemoveNoteListener(note, buttonRemove);
 
-        document.querySelector('body').appendChild(newP).appendChild(removeNote);
+        document.querySelector('body').appendChild(newP).appendChild(buttonRemove);
     });
 
     const createNote = document.createElement('button');
