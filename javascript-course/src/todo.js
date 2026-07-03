@@ -6,10 +6,57 @@ const todos =
     { title: "5", body: "Call mom", completed: false }];
 
 
-const pAppender = (replace = false) => {
+
+const filterTodos = (targetArray, filterParam = "") => {
+    targetArray = targetArray.filter((elem) => elem.body.includes(filterParam))
+    pAppender(targetArray, true)
+}
+
+
+const addFilterEvent =  (targetArray, inputElement) => {
+    inputElement.addEventListener('input', (e) => {
+        filterTodos(targetArray, e.target.value)
+    })
+}
+
+const todoFormHandle = (() => {
+    
+    const form = document.querySelector('#new-todo');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let newTodo = {title: '', body: '', completed: false};
+        newTodo.body = e.target.elements.todoBody.value;
+        todos.push(newTodo);
+        filterTodos(todos, document.querySelector('#searchText').value)
+    })
+});
+
+const addCheckboxListeners = () => {
+    document.querySelectorAll('input[type=checkbox]').forEach((cElem) => {
+        cElem.onchange = () => {
+            const elem = todos.find((element) => element.body === cElem.parentNode.textContent);
+            if (elem) {
+                elem.completed = cElem.checked;
+                const searchInput = document.querySelector('#searchText');
+                const filterValue = searchInput ? searchInput.value : '';
+                filterTodos(todos, filterValue);
+            }
+        };
+    });
+};
+
+const addInputElement = () => {
+    const searchInput = document.createElement('input');
+    searchInput.id = 'searchText';
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Add your filter text';
+    addFilterEvent(todos, searchInput);
+    document.querySelector('body').appendChild(searchInput);
+}
+
+const pAppender = (todos = todos, replace = false) => {
     if (replace) {
         document.querySelectorAll('p').forEach((p) => p.remove());
-        document.querySelector('#createTodoBtn').remove();
     }
 
     todos.sort((item1, item2) =>
@@ -27,42 +74,17 @@ const pAppender = (replace = false) => {
         p.appendChild(c);
         document.querySelector('body').appendChild(p);
     });
-    
-    addButton();
-    
-    addListeners();
+
+    addCheckboxListeners();
 };
 
-const addListeners = () => {
-    document.querySelectorAll('input[type=checkbox]').forEach((cElem) => {
-        cElem.onchange = () => {
-            const elem = todos.find((element) => element.body === cElem.parentNode.textContent);
-            if (elem) {
-                elem.completed = cElem.checked;
-                pAppender(true);
-            }
-        };
-    });
-};
 
-const addButton = () => {
-    const button = document.createElement('button');
-    button.textContent = "Add Todo";
-    button.id = 'createTodoBtn';
-    button.onclick = () => {
-        const newTodo = { title: `Todo ${todos.length + 1}`, body: `New todo ${todos.length + 1}`, completed: false };
-        todos.push(newTodo);
-        pAppender(true);
-    };
-    document.querySelector('body').appendChild(button);
-};
+addInputElement();
+pAppender(todos, false);
+todoFormHandle();
 
-const addFilterEvent = document.querySelector('#searchText')
-    .addEventListener('input', (e) => console.log(e.target))
 
-addFilterEvent;
 
-pAppender();
 
 
 

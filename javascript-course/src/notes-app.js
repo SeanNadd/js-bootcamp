@@ -1,4 +1,4 @@
-const notes = [
+let notes = [
     {
         title: "My next trip",
         body: "I would like to go to Spain"
@@ -41,6 +41,16 @@ const addInputField = (() => {
     addFilterListener(inputElem)
 })
 
+const noteFormHandles = ((notes) => document.getElementById('note-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newElement = {title: '', body: ''}
+    newElement.title = e.target.elements.title.value;
+    newElement.body = e.target.elements.body.value;
+    console.log(newElement)
+    notes.push(newElement);
+    pAppender(false, arrayFilterer(document.querySelector('#textInput').value))
+}))
+
 
 
 // Apply the filter to the notes array before running any of the renders,
@@ -58,7 +68,7 @@ const addRemoveNoteListener = ((note, button) => {
 const pAppender = (firstRender = true, notesArray) => {
     if(!firstRender){
         document.querySelectorAll('p').forEach((e) => e.remove())
-        document.querySelectorAll('button').forEach((e) => e.remove())
+        document.querySelectorAll('.noteRemoveBtn').forEach((e) => e.remove())
 
     }
     notesArray.forEach((note, index) => {
@@ -75,13 +85,12 @@ const pAppender = (firstRender = true, notesArray) => {
         document.querySelector('body').appendChild(newP).appendChild(buttonRemove);
     });
 
-    const createNote = document.createElement('button');
-    createNote.textContent = "New Note";
-    createNote.id = "create-note";
-    document.querySelector('body').appendChild(createNote);
-
-    createNote.addEventListener('click', (e) => console.log("Create note clicked"));
 };
 
+document.querySelector('#sort-selector').addEventListener('change', (e) => {
+    e.target.value
+})
+
 addInputField();
+noteFormHandles(notes);
 pAppender(true, notes);
