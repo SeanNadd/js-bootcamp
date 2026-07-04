@@ -1,96 +1,132 @@
-let notes = [
+const initialNotes = [
     {
-        title: "My next trip",
-        body: "I would like to go to Spain"
+        title: 'My next trip',
+        body: 'I would like to go to Spain'
     },
     {
-        title: "Habbits to work on",
-        body: "Exercise, Eating a bit better"
+        title: 'Habbits to work on',
+        body: 'Exercise, Eating a bit better'
     },
     {
-        title: "Office modification",
-        body: "Get a new seat"
+        title: 'Office modification',
+        body: 'Get a new seat'
     },
     {
-        title: "Grocery list",
-        body: "Milk, Bread, Eggs"
+        title: 'Grocery list',
+        body: 'Milk, Bread, Eggs'
     }
 ];
 
-let firstRender = false;
+let notes = [...initialNotes];
 
-const arrayFilterer = ((filterString) => {        
-        return notes.filter((element) => 
-            element.body.includes(filterString)
-    )})
-        
+const select = (selector) => document.querySelector(selector);
+const selectAll = (selector) => document.querySelectorAll(selector);
 
-const addFilterListener = ((inputElement) => 
-    inputElement.addEventListener('input', (e) => {
-        console.log(e);
-        let filteredArray = arrayFilterer(e.target.value)
-        pAppender(false, filteredArray)
-    })
-)
+const getFilteredNotes = (filterString = '') =>
+    notes.filter((note) => note.body.toLowerCase().includes(filterString.toLowerCase()));
 
-const addInputField = (() => {
-    const inputElem = document.createElement('input');
-    inputElem.className = 'textField';
-    inputElem.id = 'textInput';
-    document.querySelector('body').appendChild(inputElem);
-    addFilterListener(inputElem)
-})
+const getSortedNotes = (orderParam, notesToSort) => {
+    const sortedNotes = [...notesToSort];
 
-const noteFormHandles = ((notes) => document.getElementById('note-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const newElement = {title: '', body: ''}
-    newElement.title = e.target.elements.title.value;
-    newElement.body = e.target.elements.body.value;
-    console.log(newElement)
-    notes.push(newElement);
-    pAppender(false, arrayFilterer(document.querySelector('#textInput').value))
-}))
+    if (orderParam) {
+        sortedNotes.sort(orderParam);
+    }
 
+    return sortedNotes;
+};
 
+const renderNotes = (notesToRender) => {
+    selectAll('p.note').forEach((noteElement) => noteElement.remove());
+    selectAll('.noteRemoveBtn').forEach((button) => button.remove());
 
-// Apply the filter to the notes array before running any of the renders,
+    notesToRender.forEach((note, index) => {
+        const noteElement = document.createElement('p');
+        noteElement.className = 'note';
+        noteElement.textContent = `${note.title} - ${note.body}`;
 
-const addRemoveNoteListener = ((note, button) => {
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove note';
+        removeButton.className = 'noteRemoveBtn';
+        removeButton.id = index;
+        addRemoveNoteListener(note, removeButton);
+
+        document.querySelector('body').appendChild(noteElement).appendChild(removeButton);
+    });
+};
+
+const addFilterListener = (inputElement) => {
+    inputElement.addEventListener('input', (event) => {
+        const filterValue = event.target.value;
+        const filteredNotes = getFilteredNotes(filterValue);
+        renderNotes(filteredNotes);
+    });
+};
+
+const addInputField = () => {
+    const inputElement = document.createElement('input');
+    inputElement.className = 'textField';
+    inputElement.id = 'textInput';
+    document.querySelector('body').appendChild(inputElement);
+    addFilterListener(inputElement);
+};
+
+const addNoteFormListener = () => {
+    select('#note-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const newNote = {
+            title: event.target.elements.title.value,
+            body: event.target.elements.body.value
+        };
+
+        notes.push(newNote);
+        renderNotes(getFilteredNotes(select('#textInput').value));
+        event.target.reset();
+    });
+};
+
+const addSortSelectListener = () => {
+    select('#sortSelector').addEventListener('change', (event) => {
+        let orderParam = '';
+
+        if (event.target.value === 'alphabet') {
+            orderParam = (item1, item2) => {
+                const firstTitle = item1.title.toLowerCase();
+                const secondTitle = item2.title.toLowerCase();
+
+                if (firstTitle === secondTitle) {
+                    return 0;
+                }
+
+                return firstTitle < secondTitle ? -1 : 1;
+            };
+        }
+
+        const filteredNotes = getFilteredNotes(select('#textInput').value);
+        const orderedNotes = getSortedNotes(orderParam, filteredNotes);
+        renderNotes(orderedNotes);
+    });
+};
+
+const addRemoveNoteListener = (note, button) => {
     button.addEventListener('click', () => {
         const noteIndex = notes.indexOf(note);
 
-        notes.splice((noteIndex), 1);
+        if (noteIndex !== -1) {
+            notes.splice(noteIndex, 1);
+        }
 
-        pAppender(false, arrayFilterer(document.querySelector('#textInput').value))
-    })
-})
-
-const pAppender = (firstRender = true, notesArray) => {
-    if(!firstRender){
-        document.querySelectorAll('p').forEach((e) => e.remove())
-        document.querySelectorAll('.noteRemoveBtn').forEach((e) => e.remove())
-
-    }
-    notesArray.forEach((note, index) => {
-        const newP = document.createElement('p');
-        newP.className = 'note';
-        newP.textContent = note.title + " - " + note.body;
-
-        const buttonRemove = document.createElement('button');
-        buttonRemove.textContent = 'Remove note';
-        buttonRemove.className = 'noteRemoveBtn';
-        buttonRemove.id = index;
-        addRemoveNoteListener(note, buttonRemove);
-
-        document.querySelector('body').appendChild(newP).appendChild(buttonRemove);
+        renderNotes(getFilteredNotes(select('#textInput').value));
     });
-
 };
 
-document.querySelector('#sort-selector').addEventListener('change', (e) => {
-    e.target.value
-})
+const initializeApp = () => {
+    addInputField();
+    addSortSelectListener();
+    addNoteFormListener();
+    renderNotes(notes);
+};
 
-addInputField();
-noteFormHandles(notes);
-pAppender(true, notes);
+initializeApp();
+
+localStorage.setItem('key', 'value');
